@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Definição da struct Sala
+typedef struct Sala {
+    char nome[50];
+    char pista[50];
+    struct Sala* esquerda;
+    struct Sala* direita;
+} Sala;
+
+// Definição da struct PistaNode
+typedef struct PistaNode {
+    char pista[50];
+    struct PistaNode* esquerda;
+    struct PistaNode* direita;
+} PistaNode;
+
+// Função para criar uma nova sala
+Sala* criarSala(char* nome, char* pista) {
+    Sala* novaSala = (Sala*) malloc(sizeof(Sala));
+    strcpy(novaSala->nome, nome);
+    strcpy(novaSala->pista, pista);
+    novaSala->esquerda = NULL;
+    novaSala->direita = NULL;
+    return novaSala;
+}
+
+// Função para criar um novo nó de pista
+PistaNode* criarPistaNode(char* pista) {
+    PistaNode* novoNo = (PistaNode*) malloc(sizeof(PistaNode));
+    strcpy(novoNo->pista, pista);
+    novoNo->esquerda = NULL;
+    novoNo->direita = NULL;
+    return novoNo;
+}
+
+// Função para inserir uma pista na árvore de pistas
+PistaNode* inserirPista(PistaNode* raiz, char* pista) {
+    if (raiz == NULL) {
+        return criarPistaNode(pista);
+    }
+
+    if (strcmp(pista, raiz->pista) < 0) {
+        raiz->esquerda = inserirPista(raiz->esquerda, pista);
+    } else if (strcmp(pista, raiz->pista) > 0) {
+        raiz->direita = inserirPista(raiz->direita, pista);
+    }
+
+    return raiz;
+}
+
+// Função para exibir as pistas em ordem alfabética
+void exibirPistas(PistaNode* raiz) {
+    if (raiz != NULL) {
+        exibirPistas(raiz->esquerda);
+        printf("%s\n", raiz->pista);
+        exibirPistas(raiz->direita);
+    }
+}
+
+// Função para explorar as salas e coletar pistas
+void explorarSalasComPistas(Sala* salaAtual, PistaNode** pistas) {
+    if (salaAtual == NULL) {
+        printf("Você chegou ao fim da exploração!\n");
+        return;
+    }
+
+    printf("Você está na %s\n", salaAtual->nome);
+    if (strcmp(salaAtual->pista, "") != 0) {
+        printf("Pista encontrada: %s\n", salaAtual->pista);
+        *pistas = inserirPista(*pistas, salaAtual->pista);
+    }
+
+    printf("Escolha um caminho: (e) Esquerda, (d) Direita, (s) Sair\n");
+    char escolha;
+    scanf(" %c", &escolha);
+
+    switch (escolha) {
+        case 'e':
+            explorarSalasComPistas(salaAtual->esquerda, pistas);
+            break;
+        case 'd':
+            explorarSalasComPistas(salaAtual->direita, pistas);
+            break;
+        case 's':
+            printf("Você saiu da exploração!\n");
+            return;
+        default:
+            printf("Opção inválida! Tente novamente.\n");
+            explorarSalasComPistas(salaAtual, pistas);
+    }
+}
+
+int main() {
+    // Criar a árvore binária
+    Sala* hall = criarSala("Hall de Entrada", "");
+    hall->esquerda = criarSala("Sala de Estar", "Pista 1");
+    hall->direita = criarSala("Cozinha", "Pista 2");
+    hall->esquerda->esquerda = criarSala("Biblioteca", "Pista 3");
+    hall->esquerda->direita = criarSala("Jardim", "");
+    hall->direita->esquerda = criarSala("Sala de Jantar", "Pista 4");
+    hall->direita->direita = criarSala("Quarto", "");
+
+    // Criar a árvore de pistas
+    PistaNode* pistas = NULL;
+
+    // Iniciar a exploração
+    explorarSalasComPistas(hall, &pistas);
+
+    // Exibir as pistas coletadas
+    printf("Pistas coletadas:\n");
+    exibirPistas(pistas);
+
+    return 0;
+}
