@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Definição da struct Sala
+typedef struct Sala {
+    char nome[50];
+    struct Sala* esquerda;
+    struct Sala* direita;
+} Sala;
+
+// Função para criar uma nova sala
+Sala* criarSala(char* nome) {
+    Sala* novaSala = (Sala*) malloc(sizeof(Sala));
+    strcpy(novaSala->nome, nome);
+    novaSala->esquerda = NULL;
+    novaSala->direita = NULL;
+    return novaSala;
+}
+
+// Função para explorar as salas
+void explorarSalas(Sala* salaAtual) {
+    if (salaAtual == NULL) {
+        printf("Você chegou ao fim da exploração!\n");
+        return;
+    }
+
+    printf("Você está na %s\n", salaAtual->nome);
+    printf("Escolha um caminho: (e) Esquerda, (d) Direita, (s) Sair\n");
+    char escolha;
+    scanf(" %c", &escolha);
+
+    switch (escolha) {
+        case 'e':
+            explorarSalas(salaAtual->esquerda);
+            break;
+        case 'd':
+            explorarSalas(salaAtual->direita);
+            break;
+        case 's':
+            printf("Você saiu da exploração!\n");
+            return;
+        default:
+            printf("Opção inválida! Tente novamente.\n");
+            explorarSalas(salaAtual);
+    }
+}
+
+int main() {
+    // Criar a árvore binária
+    Sala* hall = criarSala("Hall de Entrada");
+    hall->esquerda = criarSala("Sala de Estar");
+    hall->direita = criarSala("Cozinha");
+    hall->esquerda->esquerda = criarSala("Biblioteca");
+    hall->esquerda->direita = criarSala("Jardim");
+    hall->direita->esquerda = criarSala("Sala de Jantar");
+    hall->direita->direita = criarSala("Quarto");
+
+    // Iniciar a exploração
+    explorarSalas(hall);
+
+    return 0;
+}
